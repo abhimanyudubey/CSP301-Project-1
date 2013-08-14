@@ -1,0 +1,111 @@
+/*
+ * Main Function for CSP301 Project 1.
+ */
+#include <GL/glut.h>  // GLUT, include glu.h and gl.h
+#include <stdio.h>
+#include "glm1/glm.hpp"
+#include "glm/glm.h"
+
+#include "TerrainRenderer.hpp"
+#include "Camera.hpp"
+#include "Physics.hpp"
+#include "ObjectRenderer.hpp"
+/* Global variables */
+//char title [] = "Motorcycle Race - CSP301 Project 1";
+//static float angle;
+Terrain* _terrain;
+/* Initialize OpenGL Graphics */
+
+//Declaring local camera variables.
+static Camera mainView(60.0f,60.0f,1.0f,0.0f,315.0/180.0f*PI);
+Object cube("cube_no_texture.obj");
+
+void initGL() {
+	glClearColor(0,200/255.0f,232/255.0f,240/255.0f);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+	glShadeModel(GL_SMOOTH);
+}
+
+/* Handler for window-repaint event. Called back when the window first appears and
+   whenever the window needs to be re-painted. */
+
+void display() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	initPhysics();
+	//Getting environment for rendering the object.
+	mainView.updateLocation(0.0,0.0);
+	updateCameraPhysics(&mainView,_terrain);
+	setViewPoint(&mainView, 1.0f, _terrain);
+
+	renderTerrain(_terrain);
+	//Rendering the Terrain.
+	mainView.drawFollower(_terrain, 1.02f, 0.5f, 1.02f);
+	cube.drawObject(GLM_SMOOTH,0,0,0);
+	glScalef(GLOBAL_SCALE,GLOBAL_SCALE,GLOBAL_SCALE);
+	//Rendering the follower object.
+
+
+	//Setting the camera to the assigned location on rendered terrain.
+
+	glutSwapBuffers();
+	//Position updates
+
+}
+
+/* Handler for window re-size event. Called back when the window first appears and
+   whenever the window is re-sized with its new width and height */
+void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
+   // Compute aspect ratio of the new window
+   if (height == 0) height = 1;                // To prevent divide by 0
+   GLfloat aspect = (GLfloat)width / (GLfloat)height;
+
+   // Set the viewport to cover the new window
+   glViewport(0, 0, width, height);
+
+   // Set the aspect ratio of the clipping volume to match the viewport
+   glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
+   glLoadIdentity();             // Reset
+   // Enable perspective projection with fovy, aspect, zNear and zFar
+   gluPerspective(_terrain->getWidth()/2, (double)width / (double)height, 0.001f, 400.0f);
+}
+
+void processSpecialKeys(int key, int xx, int yy) {
+
+	switch (key) {
+		case GLUT_KEY_LEFT :
+			mainView.updateLocation(0,-DELTA_ANGLE);
+			break;
+		case GLUT_KEY_RIGHT :
+			mainView.updateLocation(0,DELTA_ANGLE);
+			break;
+		case GLUT_KEY_UP :
+			mainView.updateLocation(OBJ_ACC,0);
+			break;
+		case GLUT_KEY_DOWN :
+			mainView.updateLocation(-OBJ_RET,0);
+			break;
+	}
+}
+/* Main function: GLUT runs as a console application starting at main() */
+int main(int argc, char** argv) {
+   glutInit(&argc, argv);            // Initialize GLUT
+   glutInitDisplayMode(GLUT_DOUBLE); // Enable double buffered mode
+   glutInitWindowSize(640, 480);   // Set the window's initial width & height
+   glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
+   glutCreateWindow("blah blah");          // Create window with the given title
+   glutDisplayFunc(display);       // Register callback handler for window re-paint event
+   glutIdleFunc(display);
+   glutReshapeFunc(reshape);       // Register callback handler for window re-size event
+   initGL();                       // Our own OpenGL initialization
+   glutSpecialFunc(processSpecialKeys);
+   const char* fname = "heightmap.bmp";
+	_terrain = loadTerrainFromHeightmap(fname,10.0f);
+   glutMainLoop();                 // Enter the infinite event-processing loop
+   return 0;
+}

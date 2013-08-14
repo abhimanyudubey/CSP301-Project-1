@@ -1,0 +1,38 @@
+/*
+ * Camera.hpp
+ *
+ *  Created on: Aug 11, 2013
+ *      Author: abhimanyu
+ */
+
+#include <GL/gl.h>
+#include <glm/glm.hpp>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "ObjectRenderer.hpp"
+
+class Camera{
+private:
+	float distance;
+	//Distance of camera from object.
+
+	float theta;
+	//Angle between the normal and the current position;
+
+	glm::vec3 realc;
+	//Real co-ordinates computed after initialization;
+
+public:
+
+	Camera(float dist, float angle, glm::vec3 initpos){
+		distance = dist;
+		theta = angle;
+		//Assigned values, now to computation.
+
+		realc[0] = distance*(sin(theta) *M_PI / 180) + initpos[0];
+		realc[1] = initpos[1];
+		realc[2] = distance*(cos(theta) *M_PI / 180) + initpos[2];
+
+	}
+};

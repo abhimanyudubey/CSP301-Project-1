@@ -1,0 +1,87 @@
+/*
+ * Camera.hpp
+ *
+ *  Created on: Aug 11, 2013
+ *      Author: abhimanyu
+ */
+
+#include <GL/gl.h>
+#include <glm/glm.hpp>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "TerrainRenderer.hpp"
+
+class Camera{
+private:
+
+public:
+	glm::vec2 planarLocation;
+	//The location of the camera on the x and z axes (as height is variable).
+
+	glm::vec2 cameraOrientation;
+	//The orientation of the camera (lx,lz) which give the final direction.
+
+	float theta;
+	//The angle created with the Y-axis, used for rotation.
+
+	float speed;
+	//The variable for handling the speed of the object.
+
+	Camera(float plx, float plz, float cox, float coz, float angle){
+		theta = angle;
+		planarLocation = glm::vec2(plx,plz);
+		cameraOrientation = glm::vec2(cox,coz);
+		speed=0.0f;
+		//Assigned the values for the camera parameters.
+
+
+	}
+	//Constructor for Camera class.
+
+	void updateLocation(float speedOffset, float angleOffset){
+		speed+=speedOffset;
+		theta+=angleOffset;
+		//Obtaining newer value of theta.
+
+		cameraOrientation[0]=sin(theta);
+		cameraOrientation[1]=-cos(theta);
+		//Updating camera direction using new angle values.
+
+		planarLocation[0]+=cameraOrientation[0]*speed;
+		planarLocation[1]+=cameraOrientation[1]*speed;
+		// Updating planar location based on new camera orientation.
+	}
+	//This function updates the location of the camera by offsets to original ones.
+
+	void resetLocation(float xOffset, float zOffset, float angleOffset){
+		planarLocation[0]=xOffset;
+		planarLocation[1]=zOffset;
+		theta=angleOffset;
+		//Obtaining newer values of Locations and theta.
+
+		cameraOrientation[0]=sin(theta);
+		cameraOrientation[1]=-cos(theta);
+		//Updating camera direction using new angle values.
+	}
+	//This function resets the location of the camera by new values.
+	void drawFollower(Terrain* _terrain, float thresh1, float thresh2, float thresh3){
+		float x = planarLocation[0],z=planarLocation[1],lx=cameraOrientation[0],lz=cameraOrientation[1];
+		float height = _terrain->getHeight((int)x,(int)z);
+		glTranslatef(x+1.5*lx,0.25f+height,z+1.5*lz);
+		glutSolidSphere(0.25f,30,30);
+	}
+
+};
+
+void setViewPoint(Camera* camera,float yOffset, Terrain* _terrain){
+	float height = _terrain->getHeight((int)camera->planarLocation[0],(int)camera->planarLocation[1]);
+	//Get the height from the terrain.
+	glm::vec2 finalLocation = camera->planarLocation+camera->cameraOrientation;
+	//Get the final location vector.
+
+	gluLookAt((double)camera->planarLocation[0],(double)(yOffset+height),(double)camera->planarLocation[1],(double)finalLocation[0],(double)(yOffset+height),(double)finalLocation[1],0.0f,1.0f,0.0f);
+	printf("%f %f %f %f %f %f \n",(double)camera->planarLocation[0],(double)(yOffset+height),(double)camera->planarLocation[1],(double)finalLocation[0],(double)(yOffset+height),(double)finalLocation[1]);
+	//For the LookAt function, the default up direction is assumed to be the Y-Axis.
+
+}

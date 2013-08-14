@@ -1,0 +1,13 @@
+Abhimanyu
+- TerrainRenderer.hpp
+- ObjectRenderer.hpp
+- Camera.hpp
+- Physics.hpp (Major contributor)
+Ankit
+- porting glm, GLM for Math, OpenGL
+- contributions to TerrainRenderer.hpp
+- created Entire Qt interface (in game_menu)
+Karan
+- Contributions to Physics.hpp
+
+

@@ -1,0 +1,181 @@
+/*
+ * Main Function for CSP301 Project 1.
+ */
+#include <GL/glut.h>  // GLUT, include glu.h and gl.h
+#include <stdio.h>
+//#include <glm1.h>
+
+#include "TerrainRenderer.hpp"
+#include "Camera.hpp"
+
+/* Global variables */
+char title[] = "3D Shapes";
+//static float angle;
+static float omega;
+static glm::vec3 speed;
+static glm::vec3 position;
+Terrain* _terrain;
+/* Initialize OpenGL Graphics */
+
+//Declaring local camera variables.
+static float x=0.0f,z=5.0f,lx=0.0f,lz=-1.0f,angle=0.0f;
+
+void initGL() {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+	glShadeModel(GL_SMOOTH);
+}
+
+/* Handler for window-repaint event. Called back when the window first appears and
+   whenever the window needs to be re-painted. */
+
+void display() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	//glScalef(0.1667, 0.01667, 0.1667);
+	//glTranslatef(position[0]+30, position[1], position[2]+30);
+	//glRotatef(-angle, position[0], position[1], position[2]);
+
+	//gluLookAt(position[0]+30, position[1]+10, position[2]+30, 30.0, 0.0, 30.0, 0.0, 0.0, 1.0);
+
+	renderTerrain(_terrain);
+	//glColor3f(0.3f, 0.9f, 3.0f);
+	//glutSolidSphere(3,100,100);
+	//drawSnowMan();
+
+//	Camera c;
+//	c.setSource(glm::vec3(4.0f,5.0f,6.0f));
+//	setView(c);glLoadIdentity();
+	// Set the camera
+	gluLookAt(	x, 1.0f, z,
+			x+lx, 1.0f,  z+lz,
+			0.0f, 1.0f,  0.0f);
+
+        // Draw ground
+	glColor3f(0.9f, 0.9f, 0.9f);
+//	glBegin(GL_QUADS);
+//		glVertex3f(-100.0f, 0.0f, -100.0f);
+//		glVertex3f(-100.0f, 0.0f,  100.0f);
+//		glVertex3f( 100.0f, 0.0f,  100.0f);
+//		glVertex3f( 100.0f, 0.0f, -100.0f);
+//	glEnd();
+
+        // Draw 36 SnowMen
+	for(int i = -3; i < 3; i++)
+		for(int j=-3; j < 3; j++) {
+			glPushMatrix();
+			glTranslatef(i*10.0,0,j * 10.0);
+			drawSnowMan();
+			glPopMatrix();
+		}
+
+	glutSwapBuffers();
+	position+=speed;
+	angle+=omega;
+}
+
+/* Handler for window re-size event. Called back when the window first appears and
+   whenever the window is re-sized with its new width and height */
+void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
+   // Compute aspect ratio of the new window
+   if (height == 0) height = 1;                // To prevent divide by 0
+   GLfloat aspect = (GLfloat)width / (GLfloat)height;
+
+   // Set the viewport to cover the new window
+   glViewport(0, 0, width, height);
+
+   // Set the aspect ratio of the clipping volume to match the viewport
+   glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
+   glLoadIdentity();             // Reset
+   // Enable perspective projection with fovy, aspect, zNear and zFar
+   gluPerspective(20.0f, (double)width / (double)height, 0.1f, 60.0);
+}
+
+void keypress(unsigned char c, int x, int y){
+	switch(c){
+	case 'w':
+	case 'W':
+	{
+		position+= glm::vec3(0.0f,0.02f,0.0f);
+		break;
+	}
+	case 's':
+	case 'S':
+	{
+		position-= glm::vec3(0.0f,0.02f,0.0f);
+		break;
+	}
+	case 'a':
+	case 'A':
+	{
+		position+= glm::vec3(0.02f,0.0f,0.0f);
+		break;
+	}
+	case 'd':
+	case 'D':
+	{
+		position-= glm::vec3(0.02f,0.0f,0.0f);
+		break;
+	}
+	case 'r':
+	case 'R':
+	{
+		position+= glm::vec3(0.0f,0.0f,0.02f);
+		break;
+	}
+	case 'f':
+	case 'F':
+	{
+		position-= glm::vec3(0.0f,0.0f,0.02f);
+		break;
+	}
+	}
+}
+void processSpecialKeys(int key, int xx, int yy) {
+
+	float fraction = 0.1f;
+
+	switch (key) {
+		case GLUT_KEY_LEFT :
+			angle -= 0.01f;
+			lx = sin(angle);
+			lz = -cos(angle);
+			break;
+		case GLUT_KEY_RIGHT :
+			angle += 0.01f;
+			lx = sin(angle);
+			lz = -cos(angle);
+			break;
+		case GLUT_KEY_UP :
+			x += lx * fraction;
+			z += lz * fraction;
+			break;
+		case GLUT_KEY_DOWN :
+			x -= lx * fraction;
+			z -= lz * fraction;
+			break;
+	}
+}
+/* Main function: GLUT runs as a console application starting at main() */
+int main(int argc, char** argv) {
+   glutInit(&argc, argv);            // Initialize GLUT
+   glutInitDisplayMode(GLUT_DOUBLE); // Enable double buffered mode
+   glutInitWindowSize(640, 480);   // Set the window's initial width & height
+   glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
+   glutCreateWindow(title);          // Create window with the given title
+   glutDisplayFunc(display);       // Register callback handler for window re-paint event
+   glutIdleFunc(display);
+   glutReshapeFunc(reshape);       // Register callback handler for window re-size event
+   initGL();                       // Our own OpenGL initialization
+   glutKeyboardFunc(keypress);
+   glutSpecialFunc(processSpecialKeys);
+   std::string filename = "heightmap.bmp";
+   const char* fname = filename.c_str();
+	_terrain = loadTerrainFromHeightmap(fname,5.0f);
+   glutMainLoop();                 // Enter the infinite event-processing loop
+   return 0;
+}

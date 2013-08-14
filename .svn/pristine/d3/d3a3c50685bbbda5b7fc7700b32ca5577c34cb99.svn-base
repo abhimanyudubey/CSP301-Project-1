@@ -1,0 +1,32 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v3.0.1270)
+
+newmtl Material.002
+kd 0.119067 0.20791 0.0249282
+ka 0 0 0
+ks 0.218384 0.288289 0.126436
+Ns 116
+illum 2
+
+newmtl Material
+kd 0.8 0.559205 0.302425
+ka 0 0 0
+ks 0.420015 0.293468 0.157968
+Ns 210
+illum 2
+map_kd Procedural,num=0,type=Clouds
+
+newmtl Material.001
+kd 0.17335 0.107574 0.042908
+ka 0 0 0
+ks 1 1 1
+Ns 50
+illum 2
+map_kd Procedural,num=2,type=Clouds
+
+newmtl DefaultMaterial
+kd 0.6 0.6 0.6
+ka 0 0 0
+ks 0.6 0.6 0.6
+illum 1
+

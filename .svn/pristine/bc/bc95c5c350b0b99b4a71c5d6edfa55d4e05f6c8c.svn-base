@@ -1,0 +1,63 @@
+
+#include <GL/gl.h>
+#include "glm1/glm.hpp"
+#include "glm/glm.h"
+#include <stdio.h>
+#include <stdlib.h>
+//#include <glm1.h>
+
+class Object{
+	private:
+		GLMmodel *model;
+		//The model for the object, loaded from the .obj file present.
+
+		glm::vec3 position;
+		//Position vector of the object, to be updated by the physics engine.
+
+		glm::vec3 vel;
+		//Velocity vector of the object.
+
+		glm::vec3 acc;
+		//Acceleration vector of the object.
+
+
+	public:
+		Object(const char* filename){
+			model = glmReadOBJ(filename);
+			position = glm::vec3(0.0);
+			vel = glm::vec3(0.0);
+			acc = glm::vec3(0.0);
+		}
+		//Constructor for Object class.
+
+		~Object(){
+			//delete model;
+
+		}
+		//Destructor
+
+//		void loadModelFromObj(Object* object, std::string filename){
+//			char* filenew = filename.c_str();
+//			object->model = glmReadOBJ(filenew);
+//
+//		}
+		//Function to load a model from a .obj file and initialize position,velocity and acceleration variables.
+
+		void drawObject(int mode, float xpos, float ypos, float zpos, Camera* camera, Terrain* _terrain){
+			glm::vec2 currentloc = camera->planarLocation;
+			float ht = _terrain->getHeight(currentloc[0],currentloc[1]);
+			glTranslatef(xpos-currentloc[0],ypos-ht,zpos-currentloc[1]);
+			glmDraw(model, mode);
+//			glTranslatef(currentloc[0],ht,currentloc[1]);
+		}
+
+		glm::vec3 getPosition(){
+			return position;
+		}
+		glm::vec3 getVelocity(){
+			return vel;
+		}
+		glm::vec3 getAcceleration(){
+			return acc;
+		}
+};

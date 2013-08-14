@@ -1,0 +1,84 @@
+
+#include <GL/gl.h>
+#include <glm/glm.hpp>
+#include <stdio.h>
+#include <stdlib.h>
+//#include <glm1.h>
+
+class Object{
+	private:
+		//GLMmodel *model;
+		//The model for the object, loaded from the .obj file present.
+
+		glm::vec3 position;
+		//Position vector of the object, to be updated by the physics engine.
+
+		glm::vec3 vel;
+		//Velocity vector of the object.
+
+		glm::vec3 acc;
+		//Acceleration vector of the object.
+
+
+	public:
+		Object(){
+			//model = NULL;
+			position = glm::vec3(0.0);
+			vel = glm::vec3(0.0);
+			acc = glm::vec3(0.0);
+		}
+		//Constructor for Object class.
+
+		~Object(){
+			//delete model;
+
+		}
+		//Destructor
+
+//		void loadModelFromObj(std::string filename){
+//			char* filenew = filename.c_str();
+//			model = glmReadOBJ(filenew);
+//
+//		}
+		//Function to load a model from a .obj file and initialize position,velocity and acceleration variables.
+
+		void drawObject(int mode){
+			//glmDraw(model, mode);
+		}
+
+		glm::vec3 getPosition(){
+			return position;
+		}
+		glm::vec3 getVelocity(){
+			return vel;
+		}
+		glm::vec3 getAcceleration(){
+			return acc;
+		}
+};
+void drawSnowMan() {
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+// Draw Body
+	glTranslatef(0.0f ,0.75f, 0.0f);
+	glutSolidSphere(0.75f,20,20);
+
+// Draw Head
+	glTranslatef(0.0f, 1.0f, 0.0f);
+	glutSolidSphere(0.25f,20,20);
+
+// Draw Eyes
+	glPushMatrix();
+	glColor3f(0.0f,0.0f,0.0f);
+	glTranslatef(0.05f, 0.10f, 0.18f);
+	glutSolidSphere(0.05f,10,10);
+	glTranslatef(-0.1f, 0.0f, 0.0f);
+	glutSolidSphere(0.05f,10,10);
+	glPopMatrix();
+
+// Draw Nose
+	glColor3f(1.0f, 0.5f , 0.5f);
+	glRotatef(0.0f,1.0f, 0.0f, 0.0f);
+	glutSolidCone(0.08f,0.5f,10,2);
+}
